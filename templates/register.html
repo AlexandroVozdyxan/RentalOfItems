@@ -1,45 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Form</title>
+  <meta charset="UTF-8">
+  <title>Title</title>
 </head>
 <body>
+    <form action="/register" method="POST">
+        Login:<br>
+        <input type="text" name="login"><br>
+        Password:<br>
+        <input type="password" name="password"><br>
+        IPN:<br>
+        <input type="text" name="ipn"><br>
+        Full name:<br>
+        <input type="text" name="full_name"><br>
+        Contacts:<br>
+        <input type="number" name="contacts"><br>
+        Photo:<br>
+        <input type="text" name="photo"><br>
+        Passport:<br>
+        <input type="text" name="passport"><br>
+        <input type="submit" value="Send">
 
-<h1>Registration Form</h1>
-<form action="/register" method="post">
-    <div>
-        <label for="login">Login:</label>
-        <input type="text" id="login" name="login" required>
-    </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div>
-        <label for="ipn">IPN:</label>
-        <input type="text" id="ipn" name="ipn" required>
-    </div>
-    <div>
-        <label for="full_name">Full Name:</label>
-        <input type="text" id="full_name" name="full_name" required>
-    </div>
-    <div>
-        <label for="contacts">Phone Number:</label>
-        <input type="text" id="contacts" name="contacts" required>
-    </div>
-    <div>
-        <label for="photo">Photo URL:</label>
-        <input type="text" id="photo" name="photo" required>
-    </div>
-    <div>
-        <label for="passport">Passport Number:</label>
-        <input type="text" id="passport" name="passport" required>
-    </div>
-
-    <input type="submit" value="Register">
-</form>
-
+    </form>
 </body>
 </html>

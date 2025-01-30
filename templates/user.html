@@ -1,46 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
 <body>
-    Hello {{ full_name }}
-    <div class="form-container">
-        <h1>User Profile</h1>
-        <form method="post" action="/items">
-            <div class="form-group">
-                <label for="name">Item Name:</label>
-                <input type="text" name="name" id="name" placeholder="Enter item name" required>
-            </div>
-            <div class="form-group">
-                <label for="photo">Photo:</label>
-                <input type="text" name="photo" id="photo" placeholder="Enter photo URL" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <input type="text" name="description" id="description" placeholder="Enter item description" required>
-            </div>
-            <div class="form-group">
-                <label for="price_hour">Price per hour:</label>
-                <input type="text" name="price_hour" id="price_hour" placeholder="Enter price per hour" required>
-            </div>
-            <div class="form-group">
-                <label for="price_day">Price per day:</label>
-                <input type="text" name="price_day" id="price_day" placeholder="Enter price per day" required>
-            </div>
-            <div class="form-group">
-                <label for="price_week">Price per week:</label>
-                <input type="text" name="price_week" id="price_week" placeholder="Enter price per week" required>
-            </div>
-            <div class="form-group">
-                <label for="price_month">Price per month:</label>
-                <input type="text" name="price_month" id="price_month" placeholder="Enter price per month" required>
-            </div>
-            <div class="form-group">
-                <label for="owner">Owner:</label>
-                <input type="text" name="owner" id="owner" placeholder="Enter owner name" required>
-            </div>
-            <input type="submit" value="Save">
-        </form>
-    </div>
 
+Hello {{ full_name }}
+
+
+
+
+<form action="/items" method="POST">
+    Item Name:<br>
+    <input type="text" id="name"><br>
+    Photo:<br>
+    <input type="text" name="photo"><br>
+    Description:<br>
+    <input type="text" name="description"><br>
+    Price per hour:<br>
+    <input type="text" name="price_hour"><br>
+    Price per day:<br>
+    <input type="text" name="price_day"><br>
+    Price per week:<br>
+    <input type="text" name="price_week"><br>
+    Price per month:<br>
+    <input type="text" name="price_month"><br>
+    <input type="hidden" name="owner">
+
+    <input type="submit" value="Send">
+</form>
 </body>
 </html>

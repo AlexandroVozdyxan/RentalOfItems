@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ item.name }}</title>
+</head>
+<body>
+    <h1>{{ item.name }}</h1>
+    <img src="{{ item.photo }}" alt="{{ item.name }}" width="200"><br>
+    <p>{{ item.description }}</p>
+    <ul>
+        <li>Price per hour: {{ item.price_hour }}</li>
+        <li>Price per day: {{ item.price_day }}</li>
+        <li>Price per week: {{ item.price_week }}</li>
+        <li>Price per month: {{ item.price_month }}</li>
+    </ul>
+    <small>Owner: {{ item.owner }}</small>
+</body>
+</html>

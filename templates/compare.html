@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <form id="complain" action="/complain" method="post">
+        <h2>Submit Your Complaint</h2>
+        <p><strong>Author:</strong><br>
+            <input type="text" name="author" required placeholder="Enter your name">
+        </p>
+        <p><strong>User:</strong><br>
+            <input type="text" name="user" required placeholder="User you are complaining about">
+        </p>
+        <p><strong>Grade:</strong><br>
+            <input type="text" name="grade" required placeholder="Rating from 1 to 5">
+        </p>
+        <p><strong>Contract ID:</strong><br>
+            <input type="number" name="contract" step="0.01" required placeholder="Enter contract ID">
+        </p>
+        <input type="submit" value="Send Feedback">
+    </form>
+
+</body>
+</html>
