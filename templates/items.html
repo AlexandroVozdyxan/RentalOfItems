@@ -5,18 +5,19 @@
     <title>Items</title>
 </head>
 <body>
-    <h1>Items</h1>
+    <h1>All Items</h1>
     <ul>
         {% for item in items %}
             <li>
-                <img src="{{ item.photo }}" alt="{{ item.name }}" width="100"><br>
-                <strong>{{ item.name }}</strong><br>
-                {{ item.description }}<br>
-                <small>Price per hour: {{ item.price_hour }}</small><br>
-                <small>Price per day: {{ item.price_day }}</small><br>
-                <small>Price per week: {{ item.price_week }}</small><br>
-                <small>Price per month: {{ item.price_month }}</small><br>
-                <small>Owner: {{ item.owner }}</small>
+                <h2>{{ item.name }}</h2>
+                <img src="{{ item.photo }}" alt="{{ item.name }}" width="200"><br>
+                <p>{{ item.description }}</p>
+                <ul>
+                    <li>Price per hour: {{ item.price_hour }}</li>
+                    <li>Price per day: {{ item.price_day }}</li>
+                    <li>Price per week: {{ item.price_week }}</li>
+                    <li>Price per month: {{ item.price_month }}</li>
+                </ul>
             </li>
         {% else %}
             <li>No items found.</li>

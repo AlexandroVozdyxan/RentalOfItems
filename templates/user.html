@@ -6,29 +6,19 @@
 </head>
 <body>
 
-Hello {{ full_name }}
-
-
-
-
+Hello {{ user.full_name }}
 <form action="/items" method="POST">
-    Item Name:<br>
-    <input type="text" id="name"><br>
-    Photo:<br>
-    <input type="text" name="photo"><br>
-    Description:<br>
-    <input type="text" name="description"><br>
-    Price per hour:<br>
-    <input type="text" name="price_hour"><br>
-    Price per day:<br>
-    <input type="text" name="price_day"><br>
-    Price per week:<br>
-    <input type="text" name="price_week"><br>
-    Price per month:<br>
-    <input type="text" name="price_month"><br>
-    <input type="hidden" name="owner">
-
-    <input type="submit" value="Send">
+    <input type="text" name="name" placeholder="Item Name" required><br>
+    <input type="text" name="description" placeholder="Description" required><br>
+    <input type="text" name="photo" placeholder="Photo URL" required><br>
+    <input type="number" name="price_hour" placeholder="Price per hour" required><br>
+    <input type="number" name="price_day" placeholder="Price per day" required><br>
+    <input type="number" name="price_week" placeholder="Price per week" required><br>
+    <input type="number" name="price_month" placeholder="Price per month" required><br>
+    <input type="hidden" name="owner" value="{{ session.user }}"><br>
+    <button type="submit">Add Item</button>
 </form>
+
+
 </body>
 </html>
