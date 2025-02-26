@@ -25,7 +25,7 @@ def dict_factory(cursor, row):
 
 class Db_open_close(object):
     def __init__(self, database):
-        self.con = sqlite3.connect('db1.db')
+        self.con = sqlite3.connect('db1_.db')
         self.con.row_factory = dict_factory
         self.cur = self.con.cursor()
     def __enter__(self):
@@ -35,7 +35,7 @@ class Db_open_close(object):
         self.con.close()
 
 class DbHandler:
-    db_file = "db1.db"
+    db_file = "db1_.db"
 
     def select(self, table_name, filter_dict=None):
         if filter_dict is None:
@@ -92,7 +92,7 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     if request.method == 'POST':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             form_data = request.form
             db_connector.insert('user', form_data)
         return redirect('/login')
@@ -181,7 +181,7 @@ def item(item_id):
 @app.route('/leasers', methods=['GET'])
 def leasers():
     if request.method == 'GET':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             db_connector.select('leaser')
             leaser_data = db_cur.fetchall()
             return render_template('user.html', user=leaser_data)
@@ -190,7 +190,7 @@ def leasers():
 @app.route('/leasers/<leaser_id>', methods=['GET'])
 def leaser(leaser_id):
     if request.method == 'GET':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             db_connector.select('leaser', {'leaser_id': leaser_id})
         return 'GET'
 
@@ -198,12 +198,12 @@ def leaser(leaser_id):
 @login_required
 def contracts():
     if request.method == 'GET':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             db_connector.select('contract', {'leaser': session['user']})
             contracts = db_cur.fetchall()
             return render_template('contract.html', contracts=contracts)
     if request.method == 'POST':
-           with Db_open_close('db1.db') as db_cur:
+           with Db_open_close('db1_.db') as db_cur:
                 form_data = request.form
                 db_connector.insert('contract', form_data)
                 return redirect('/')
@@ -211,7 +211,7 @@ def contracts():
 @app.route('/contracts/<contract_id>', methods=['GET', 'PUT', 'PATCH'])
 def contracts_id(contract_id):
     if request.method == 'GET':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             db_connector.select('contract', {'contract_id': contract_id})
             contract = db_cur.fetchone()
             return render_template('contract.html', contract=contract)
@@ -230,7 +230,7 @@ def search():
 @app.route('/complaints', methods=['GET', 'POST'])
 def complaints():
     if request.method == 'POST':
-        with Db_open_close('db1.db') as db_cur:
+        with Db_open_close('db1_.db') as db_cur:
             form_data = request.form
             db_connector.insert('feedback', form_data)
 
