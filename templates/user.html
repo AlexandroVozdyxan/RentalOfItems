@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <link rel="stylesheet" href='/static/style.css' />
 </head>
 <body>
 
-Hello {{ full_name }}
+Hello {{ session.full_name }}
 
 
 
 
 <form action="/items" method="POST">
     Item Name:<br>
-    <input type="text" id="name"><br>
+    <input type="text" name="name" id="name"><br>
     Photo:<br>
     <input type="text" name="photo"><br>
     Description:<br>
@@ -30,5 +31,8 @@ Hello {{ full_name }}
 
     <input type="submit" value="Send">
 </form>
+<a href="/">Home</a>
+<a href="/items">Items</a>
+<a href="/logout">Logout</a>
 </body>
 </html>

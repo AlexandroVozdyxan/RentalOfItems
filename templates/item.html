@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ item.name }}</title>
+    <link rel="stylesheet" href='/static/style.css' />
 </head>
 <body>
     <h1>{{ item.name }}</h1>
@@ -15,5 +16,26 @@
         <li>Price per month: {{ item.price_month }}</li>
     </ul>
     <small>Owner: {{ item.owner }}</small>
+
+    {% if user_id == item.owner %}
+    <div class="actions">
+        <form action="/items/{{ item.id }}/delete" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Delete">
+        </form>
+    </div>
+    {% endif %}
+
+    {% if user_id != item.owner %}
+    <div class="actions">
+        <a href="{{ url_for('contracts', item_id=item.id) }}">Create contract</a>
+    </div>
+    {% endif %}
+
+    <div class="navigation">
+        <a href="/">Home</a>
+        <a href="/items">Items</a>
+        <a href="/profile">Profile</a>
+    </div>
 </body>
 </html>

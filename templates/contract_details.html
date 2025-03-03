@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Details</title>
+</head>
+<body>
+    <h2>Contract Details</h2>
+    <p><strong>ID:</strong> {{ contract.id }}</p>
+    <p><strong>Text:</strong> {{ contract.text }}</p>
+    <p><strong>Start Date:</strong> {{ contract.start_day }}</p>
+    <p><strong>End Date:</strong> {{ contract.end_day }}</p>
+    <p><strong>Leaser:</strong> {{ name1.full_name }}</p>
+    <p><strong>Taker:</strong> {{ name2.full_name }}</p>
+    <p><strong>Item:</strong> {{ item.name }}</p>
+    <p><strong>Status:</strong> {{ contract.status }}</p>
+    <p><strong>Signed:</strong> {{ contract.signed_datetime }}</p>
+
+    <a href="/contracts">Back to Contracts</a>
+</body>
+</html>

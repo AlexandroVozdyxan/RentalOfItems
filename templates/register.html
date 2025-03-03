@@ -3,25 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <link rel="stylesheet" href='/static/style.css' />
 </head>
 <body>
     <form action="/register" method="POST">
         Login:<br>
-        <input type="text" name="login"><br>
+        <input type="text" name="login" placeholder="Login"><br>
         Password:<br>
-        <input type="password" name="password"><br>
+        <input type="password" name="password" placeholder="Password"><br>
         IPN:<br>
-        <input type="text" name="ipn"><br>
+        <input type="text" name="ipn" placeholder="IPN"><br>
         Full name:<br>
-        <input type="text" name="full_name"><br>
+        <input type="text" name="full_name" placeholder="Full name"><br>
         Contacts:<br>
-        <input type="number" name="contacts"><br>
+        <input type="number" name="contacts" placeholder="Contracts"><br>
         Photo:<br>
-        <input type="text" name="photo"><br>
+        <input type="text" name="photo" placeholder="Photo"><br>
         Passport:<br>
-        <input type="text" name="passport"><br>
+        <input type="text" name="passport" placeholder="Passport"><br>
         <input type="submit" value="Send">
 
     </form>
+
+<a href="/">Home</a>
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+<a href="/items">Items</a>
+<a href="/profile">Profile</a>
 </body>
 </html>

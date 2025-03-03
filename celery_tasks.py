@@ -1,12 +1,9 @@
 import os
-from datetime import datetime
-
+import smtplib
 from celery import Celery
 from sqlalchemy import select
-
-from app import db_connector
 from database import init_db, db_session
-from model import Item, Contract
+from model import Contract, Item
 
 app = Celery('tasks', broker=f'pyamqp://guest@{os.environ.get("RABBITMQ_HOST", "localhost")}//')
 
@@ -26,7 +23,7 @@ def send_email(contract_id):
     contract = db_session.execute(select(Contract).filter_by(id=contract_id)).scalar()
     item = db_session.execute(select(Item).filter_by(id=contract.item)).scalar()
 
-    import smtplib
+
     # creates SMTP session
     s = smtplib.SMTP('smtp.gmail.com', 587)
     # start TLS for security
