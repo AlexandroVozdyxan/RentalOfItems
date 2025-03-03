@@ -252,7 +252,7 @@ def contracts():
         contract.leaser = session['user']
         database.db_session.add(contract)
         database.db_session.commit()
-        celery_tasks.send_email(contract.id)
+        celery_tasks.send_email(model.Contract.id)
         return redirect('/')
 
 
