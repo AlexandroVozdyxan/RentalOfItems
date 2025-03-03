@@ -4,6 +4,11 @@ from flask import Flask, render_template, redirect, session
 from flask import request
 import sqlite3
 
+from sqlalchemy import select, update
+
+import celery_tasks
+import database
+import model
 
 app = Flask(__name__)
 app.secret_key = 'FEh3487duH3&*#HS#d98H#d'
@@ -80,23 +85,27 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user_data = db_connector.select(
-            'user', {'login': username, 'password': password})
+
+        database.init_db()
+        user_data = database.db_session.execute(
+            select(model.User).filter_by(login=username, password=password)
+        ).scalar()
         if user_data:
-            session['user'] = user_data[0]['id']
+            session['user'] = user_data.user_id
             return redirect('/profile')
         else:
-            return render_template('login.html', error="Invalid username or password")
+            return render_template('login.html', error='Invalid username or password')
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
     if request.method == 'POST':
-        with Db_open_close('db1_.db') as db_cur:
-            form_data = request.form
-            db_connector.insert('user', form_data)
+        form_data = dict(request.form)
+        database.init_db()
+        user = model.User(**form_data)
+        database.db_session.add(user)
+        database.db_session.commit()
         return redirect('/login')
-
 
 @app.route('/logout', methods=['GET', 'POST', 'DELETE'])
 def logout():
@@ -106,22 +115,29 @@ def logout():
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 @login_required
 def profile():
-   if request.method == 'GET':
-       user_data = db_connector.select('user', {'id': session['user']})
+    database.init_db()
+    if session.get('user') is None:
+        return redirect('/login')
+    if request.method == 'GET':
+        user_data = database.db_session.execute(
+            select(model.User).filter_by(user_id=session['user'])).scalar()
+        return render_template('user.html', user=user_data)
+    if request.method == 'POST':
+        database.init_db()
+        user = database.db_session.execute(update(model.User).filter_by(user=session['user']).values(**request.form))
+        database.db_session.commit()
+        database.db_session.close()
+        return redirect('/user')
+    if request.method == 'DELETE':
+        user = database.db_session.execute(select('user').filter_by(
+            user_id=session['user'])).scalar()
+        database.db_session.delete(user)
+        database.db_session.commit()
+        session.pop('user', None)
+        session.pop(user, None)
+        return redirect('/login')
 
-       if user_data:
-           user_data = user_data[0]
 
-           return render_template('user.html', user=user_data)
-       else:
-            return redirect('/login')
-
-   if request.method == 'PUT':
-       return 'PUT'
-   if request.method == 'PATCH':
-       return 'PATCH'
-   if request.method == 'DELETE':
-       return 'DELETE'
 
 @app.route('/profile/favorites', methods=['GET', 'POST', 'DELETE'])
 def favorites():
@@ -151,18 +167,21 @@ def search_history():
 @app.route('/items', methods=['GET', 'POST'])
 def items():
     if request.method == 'GET':
-        items_data = db_connector.select('item')
-        print(f"Items data: {items_data}")
-        return render_template('items.html', items=items_data)
+        database.init_db()
+        item_data = select(model.Item)
+        item_data = database.db_session.execute(select(model.Item)).scalar()
+        return render_template('items.html', items=item_data)
 
     if request.method == 'POST':
         if session.get('user') is None:
             return redirect('/login')
-        query_args = request.form
-        query = dict(query_args)
-        query['owner'] = session['user']
 
-        db_connector.insert('item', query)
+        database.init_db()
+        item = model.Item(**request.form)
+        item.owner = session['user']
+
+        database.db_session.add(item)
+        database.db_session.commit()
 
         return redirect('/items')
 
@@ -170,13 +189,22 @@ def items():
 @app.route('/items/<item_id>', methods=['GET', 'PUT', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
-        item_data = db_connector.select('item', {'id': item_id})
-        if item_data:
-            return render_template('item.html', item=item_data[0])
-        else:
-            return "Item not found", 404
-    if request.method == 'DELETE':
-        return 'DELETE'
+        if session.get('user') is None:
+            return redirect('/login')
+        database.init_db()
+        item = database.db_session.execute(select(model.Item).filter_by(id=item_id)).scalar()
+        return render_template('item.html', item=item, user_id=session['user'])
+
+@app.route('/items/<int:item_id>/delete', methods=['DELETE'])
+@login_required
+def item_delete(item_id):
+    database.init_db()
+    item = database.db_session.get(model.Item, id=item_id)
+    if item and session.get('user') == item.owner:
+        database.db_session.delete(item)
+        database.db_session.commit()
+        return render_template('/')
+    return redirect('User not in session or not found such item')
 
 @app.route('/leasers', methods=['GET'])
 def leasers():
@@ -198,27 +226,38 @@ def leaser(leaser_id):
 @login_required
 def contracts():
     if request.method == 'GET':
-        with Db_open_close('db1_.db') as db_cur:
-            db_connector.select('contract', {'leaser': session['user']})
-            contracts = db_cur.fetchall()
-            return render_template('contract.html', contracts=contracts)
+        database.init_db()
+        contracts = database.db_session.execute(select(model.Contract)).scalar().all
+        leaser = database.db_session.execute(select(model.User).filter_by(
+            user_id=model.Contract.leaser)).scalar()
+        taker = database.db_session.execute(select(model.User).filter_by(
+            user_id=model.Contract.taker)).scalar()
+        item = database.db_session.execute(select(model.Item).filter_by(
+            id=model.Contract.item)).scalar()
+        return render_template('contract.html', contracts=contracts, leaser=leaser, taker=taker, item=item)
     if request.method == 'POST':
-           with Db_open_close('db1_.db') as db_cur:
-                form_data = request.form
-                db_connector.insert('contract', form_data)
-                return redirect('/')
+        contract = model.Contract(**request.form)
+        contract.leaser = session['user']
+        database.db_session.add(contract)
+        database.db_session.commit()
+        celery_tasks.send_email(contract.id)
+        return redirect('/')
 
-@app.route('/contracts/<contract_id>', methods=['GET', 'PUT', 'PATCH'])
+
+@app.route('/contracts/<int:contract_id>', methods=['GET'])
+@login_required
 def contracts_id(contract_id):
     if request.method == 'GET':
-        with Db_open_close('db1_.db') as db_cur:
-            db_connector.select('contract', {'contract_id': contract_id})
-            contract = db_cur.fetchone()
-            return render_template('contract.html', contract=contract)
-    if request.method == 'PUT':
-        return f'PUT: {contract_id}'
-    if request.method == 'PATCH':
-        return f'PATCH: {contract_id}'
+        database.init_db()
+        if session.get('user') is None:
+            return redirect('/login')
+        contract = database.db_session.execute(
+            select(model.Contract).filter_by(
+                id=contract_id)).scalar()
+        name1 = database.db_session.execute(select(model.User).filter_by(user_id=contract.leaser)).scalar()
+        name2 = database.db_session.execute(select(model.User).filter_by(user_id=contract.taker)).scalar()
+        item = database.db_session.execute(select(model.Item).filter_by(id=contract.item)).scalar()
+        return render_template('contract.html', contract=contract, name1=name1, name2=name2, item=item)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -250,6 +289,12 @@ def compare():
         return "Items not found", 404
     if request.method == 'PUT':
         return 'PUT'
+
+
+@app.route('/add_task', methods=['GET'])
+def set_task():
+    celery_tasks.add.delay(1, 2)
+    return "Task sent"
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
