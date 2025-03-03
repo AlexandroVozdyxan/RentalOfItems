@@ -3,45 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Contracts</title>
 </head>
 <body>
+    <h2>All Contracts</h2>
+    <p>Number of contracts: {{ contracts|length }}</p>
 
-    <form id="contract" action="/contract" method="post">
-        <p>contract count: {{ contract|length }}</p>
-        {% for one_contract in contract %}
-            <div>
-                <h2>{{ one_contract }}</h2>
-                <ul>
-                    <li>Text: {{ one_contract.text }}</li>
-                    <li>Date of start: {{ one_contract.start_date }}</li>
-                    <li>Date of end: {{ one_contract.end_date }}</li>
-                    <li>Leaser: {{ one_contract.leaser }}</li>
-                    <li>Taker: {{ one_contract.taker }}</li>
-                    <li>Item: {{ one_contract.item }}</li>
-                </ul>
-                <hr>
-            </div>
-        {% endfor %}
-        <p>Text: <br><input type="text" name="text" required><br></p>
-        <p>Date of start: <br><input type="date" name="start_date" required><br></p>
-        <p>Date of end: <br><input type="date" name="end_date" required><br></p>
-        <p>Leaser: <br><input type="text" name="leaser" required><br></p>
-        <p>Taker: <br><input type="text" name="taker" required><br></p>
-        <p>Item: <br><input type="text" name="item" required><br></p>
-        <input type="submit" value="Send">
+    <!-- Список всех контрактов -->
+    {% for contract in contracts %}
+        <div>
+            <h3>Contract ID: {{ contract.id }}</h3>
+            <p>Item: {{ item.name }}</p>
+            <p>Leaser: {{ leaser.full_name }}</p>
+            <p>Taker: {{ taker.full_name }}</p>
+            <p>Start Date: {{ contract.start_day }}</p>
+            <p>End Date: {{ contract.end_day }}</p>
+            <a href="/contracts/{{ contract.id }}">View Details</a>
+            <hr>
+        </div>
+    {% endfor %}
+
+    <h2>Create a New Contract</h2>
+    <form action="/contracts" method="post">
+        <label>Contract Text:</label>
+        <input type="text" name="text" required><br>
+
+        <label>Start Date:</label>
+        <input type="date" name="start_day" required><br>
+
+        <label>End Date:</label>
+        <input type="date" name="end_day" required><br>
+
+        <label>Leaser:</label>
+        <input type="text" name="leaser" required><br>
+
+        <label>Taker:</label>
+        <input type="text" name="taker" required><br>
+
+        <label>Item:</label>
+        <input type="text" name="item" required><br>
+
+        <input type="submit" value="Create Contract">
     </form>
-
-    <br>
-    <hr />
-
-    <form id="complain" action="/complain" method="post">
-        <p>Author: <br><input type="text" name="author" required><br></p>
-        <p>User: <br><input type="text" name="user" required><br></p>
-        <p>Grade: <br><input type="text" name="grade" required><br></p>
-        <p>Contract: <br><input type="number" name="contract" step="0.01" required><br></p>
-        <input type="submit" value="Send">
-    </form>
-
+        <a href="/">Home</a>
+        <a href="/items">Items</a>
+        <a href="/profile">Profile</a>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import Flask, render_template, redirect, session
+from flask import Flask, render_template, redirect, session, jsonify
 from flask import request
 import sqlite3
 
@@ -10,7 +10,7 @@ import celery_tasks
 import database
 import model
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = 'FEh3487duH3&*#HS#d98H#d'
 
 
@@ -91,10 +91,11 @@ def login():
             select(model.User).filter_by(login=username, password=password)
         ).scalar()
         if user_data:
-            session['user'] = user_data.user_id
+            session['user'] = user_data.id
             return redirect('/profile')
         else:
             return render_template('login.html', error='Invalid username or password')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -112,31 +113,39 @@ def logout():
     session.pop('user', None)
     return redirect('/login')
 
-@app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+
+@app.route('/profile', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 @login_required
 def profile():
     database.init_db()
     if session.get('user') is None:
         return redirect('/login')
+
     if request.method == 'GET':
         user_data = database.db_session.execute(
-            select(model.User).filter_by(user_id=session['user'])).scalar()
+            select(model.User).filter_by(id=session['user'])
+        ).scalar()
         return render_template('user.html', user=user_data)
+
     if request.method == 'POST':
-        database.init_db()
-        user = database.db_session.execute(update(model.User).filter_by(user=session['user']).values(**request.form))
+        user = database.db_session.execute(
+            update(model.User).filter_by(id=session['user']).values(**request.form)
+        )
+        print(item.name)
         database.db_session.commit()
         database.db_session.close()
         return redirect('/user')
-    if request.method == 'DELETE':
-        user = database.db_session.execute(select('user').filter_by(
-            user_id=session['user'])).scalar()
-        database.db_session.delete(user)
-        database.db_session.commit()
-        session.pop('user', None)
-        session.pop(user, None)
-        return redirect('/login')
 
+    if request.method == 'DELETE':
+        user = database.db_session.execute(
+            select(model.User).filter_by(id=session['user'])
+        ).scalar()
+        if user:
+            database.db_session.delete(user)
+            database.db_session.commit()
+            session.pop('user', None)
+            return redirect('/login')
+        return redirect('/profile')
 
 
 @app.route('/profile/favorites', methods=['GET', 'POST', 'DELETE'])
@@ -168,8 +177,7 @@ def search_history():
 def items():
     if request.method == 'GET':
         database.init_db()
-        item_data = select(model.Item)
-        item_data = database.db_session.execute(select(model.Item)).scalar()
+        item_data = database.db_session.execute(select(model.Item)).scalars().all()  # Використовуємо all() для отримання списку
         return render_template('items.html', items=item_data)
 
     if request.method == 'POST':
@@ -186,6 +194,7 @@ def items():
         return redirect('/items')
 
 
+
 @app.route('/items/<item_id>', methods=['GET', 'PUT', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
@@ -195,16 +204,19 @@ def item(item_id):
         item = database.db_session.execute(select(model.Item).filter_by(id=item_id)).scalar()
         return render_template('item.html', item=item, user_id=session['user'])
 
-@app.route('/items/<int:item_id>/delete', methods=['DELETE'])
+@app.route('/items/<int:item_id>/delete', methods=['POST'])
 @login_required
 def item_delete(item_id):
-    database.init_db()
-    item = database.db_session.get(model.Item, id=item_id)
-    if item and session.get('user') == item.owner:
-        database.db_session.delete(item)
-        database.db_session.commit()
-        return render_template('/')
-    return redirect('User not in session or not found such item')
+    if request.method == 'POST' and request.form.get('_method') == 'DELETE':
+        database.init_db()
+        item = database.db_session.get(model.Item, item_id)  # Исправленный метод get
+        if item and session.get('user') == item.owner:
+            database.db_session.delete(item)
+            database.db_session.commit()
+            return redirect('/items'), 200
+    return jsonify({'error': 'User not in session or item not found'}), 404
+
+
 
 @app.route('/leasers', methods=['GET'])
 def leasers():
@@ -227,11 +239,11 @@ def leaser(leaser_id):
 def contracts():
     if request.method == 'GET':
         database.init_db()
-        contracts = database.db_session.execute(select(model.Contract)).scalar().all
+        contracts = database.db_session.execute(select(model.Contract)).scalars().all()
         leaser = database.db_session.execute(select(model.User).filter_by(
-            user_id=model.Contract.leaser)).scalar()
+            id=model.Contract.leaser)).scalar()
         taker = database.db_session.execute(select(model.User).filter_by(
-            user_id=model.Contract.taker)).scalar()
+            id=model.Contract.taker)).scalar()
         item = database.db_session.execute(select(model.Item).filter_by(
             id=model.Contract.item)).scalar()
         return render_template('contract.html', contracts=contracts, leaser=leaser, taker=taker, item=item)
@@ -254,8 +266,8 @@ def contracts_id(contract_id):
         contract = database.db_session.execute(
             select(model.Contract).filter_by(
                 id=contract_id)).scalar()
-        name1 = database.db_session.execute(select(model.User).filter_by(user_id=contract.leaser)).scalar()
-        name2 = database.db_session.execute(select(model.User).filter_by(user_id=contract.taker)).scalar()
+        name1 = database.db_session.execute(select(model.User).filter_by(id=contract.leaser)).scalar()
+        name2 = database.db_session.execute(select(model.User).filter_by(id=contract.taker)).scalar()
         item = database.db_session.execute(select(model.Item).filter_by(id=contract.item)).scalar()
         return render_template('contract.html', contract=contract, name1=name1, name2=name2, item=item)
 

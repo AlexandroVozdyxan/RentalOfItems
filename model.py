@@ -9,7 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     login = Column(String(50), unique=True)
     password = Column(String(50))
-    ipn = Column(Integer, unique=True)
+    ipn = Column(Integer, unique=False)
     full_name = Column(String(150))
     contacts = Column(String(150))
     photo = Column(String(150))
@@ -32,7 +32,7 @@ class Item(Base):
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True, autoincrement=True)
     photo = Column(String(150))
-    name = Column(String(150), unique=True)
+    name = Column(String(150), nullable=False)
     description = Column(String(150))
     price_hour = Column(REAL)
     price_day = Column(REAL)
@@ -115,4 +115,3 @@ class Search_History(Base):
         self.user = user
         self.search_item = search_item
         self.timestamp = timestamp
-

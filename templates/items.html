@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Items</title>
+    <link rel="stylesheet" href='/static/style.css' />
 </head>
 <body>
     <h1>Items</h1>
@@ -16,11 +17,17 @@
                 <small>Price per day: {{ item.price_day }}</small><br>
                 <small>Price per week: {{ item.price_week }}</small><br>
                 <small>Price per month: {{ item.price_month }}</small><br>
-                <small>Owner: {{ item.owner }}</small>
+                <small>Owner: {{ item.owner }}</small><br>
+                <a href="/items/{{ item.id }}">Details</a>
             </li>
         {% else %}
             <li>No items found.</li>
         {% endfor %}
     </ul>
+<a href="/">Home</a>
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+
+<a href="/profile">Profile</a>
 </body>
 </html>
